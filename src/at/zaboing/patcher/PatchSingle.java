@@ -2,15 +2,16 @@ package at.zaboing.patcher;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class PatchSingle extends PatchElement {
 
-	private Path path;
+	private String path;
 
 	public PatchSingle(String path) {
-		this.path = Paths.get(path);
+		this.path = path;
 	}
 	
 	public boolean equals(Object o) {
@@ -34,11 +35,11 @@ public class PatchSingle extends PatchElement {
 		return path.toString();
 	}
 
-	public String getHash() {
+	public String getHash(String rootDir) {
 		byte[] hash;
 
 		try {
-			byte[] content = Files.readAllBytes(path);
+			byte[] content = Files.readAllBytes(Paths.get(rootDir, path));
 
 			hash = HashUtils.hash(content);
 		} catch (IOException e) {
@@ -49,4 +50,10 @@ public class PatchSingle extends PatchElement {
 		return HashUtils.toHexString(hash);
 	}
 
+	public void zip(ZipOutputStream zipStream, String rootDir) throws IOException {
+		ZipEntry entry = new ZipEntry(path.toString());
+		zipStream.putNextEntry(entry);
+		zipStream.write(Files.readAllBytes(Paths.get(rootDir, path)));
+		zipStream.closeEntry();
+	}
 }

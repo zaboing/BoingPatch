@@ -7,63 +7,62 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
-import com.google.common.hash.Hasher;
-
-public class HashingVisitor implements FileVisitor<Path> {
+public class ZippingVisitor implements FileVisitor<Path> {
 
 	private final Path rootDir;
-	
-	private final Hasher hasher = HashUtils.hasher();
-
 	private final PatchGroup group;
-
-	public HashingVisitor(PatchGroup group, String rootDir) {
+	private final ZipOutputStream zipStream;
+	
+	public ZippingVisitor(PatchGroup group, ZipOutputStream zipStream, String rootDir) {
 		this.group = group;
+		this.zipStream = zipStream;
 		this.rootDir = Paths.get(rootDir);
 	}
-
-	@Override
+	
 	public FileVisitResult postVisitDirectory(Path arg0, IOException arg1)
 			throws IOException {
 		return FileVisitResult.CONTINUE;
 	}
 
-	@Override
 	public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
 		String path = rootDir.relativize(arg0).toString();
-		System.out.println(path);
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.SKIP_SUBTREE;
 		}
-
-		hasher.putBytes(path.getBytes("UTF-8"));
-
+		
+		if (!path.endsWith("/")) {
+			path += "/";
+		}
+		
+		ZipEntry entry = new ZipEntry(path);
+		zipStream.putNextEntry(entry);
+		zipStream.closeEntry();
+		
 		return FileVisitResult.CONTINUE;
 	}
 
-	@Override
 	public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
 		String path = rootDir.relativize(arg0).toString();
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.CONTINUE;
 		}
-
-		hasher.putBytes(path.getBytes("UTF-8"));
-		hasher.putBytes(Files.readAllBytes(arg0));
-
+		
+		ZipEntry entry = new ZipEntry(path);
+		zipStream.putNextEntry(entry);
+		zipStream.write(Files.readAllBytes(arg0));
+		zipStream.closeEntry();
+		
 		return FileVisitResult.CONTINUE;
 	}
 
-	@Override
 	public FileVisitResult visitFileFailed(Path arg0, IOException arg1)
 			throws IOException {
 		return FileVisitResult.CONTINUE;
 	}
 
-	public byte[] getHash() {
-		return hasher.hash().asBytes();
-	}
 }

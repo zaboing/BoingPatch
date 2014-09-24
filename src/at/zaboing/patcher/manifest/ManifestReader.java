@@ -47,8 +47,7 @@ public class ManifestReader {
 					continue;
 				}
 				String command = line.substring(0, line.indexOf(' '));
-				String param = "test_area/"
-						+ line.substring(line.indexOf(' ') + 1);
+				String param = line.substring(line.indexOf(' ') + 1);
 
 				switch (command.toLowerCase()) {
 				case "group":
@@ -80,16 +79,5 @@ public class ManifestReader {
 		}
 
 		return manifest;
-	}
-
-	public static void main(String[] args) {
-		try {
-			ManifestReader reader = new ManifestReader("manifest.pmf");
-			PatchManifest manifest = reader.read();
-			manifest.elements.forEach(element -> System.out.println(element.toString()));
-			System.out.println(manifest.equals(manifest));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
 }

@@ -2,18 +2,18 @@ package at.zaboing.patcher;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipOutputStream;
 
 public class PatchGroup extends PatchElement {
 
-	private Path path;
-	private final List<Path> exceptions = new ArrayList<Path>();
+	private String path;
+	private final List<String> exceptions = new ArrayList<String>();
 
 	public PatchGroup(String path) {
-		this.path = Paths.get(path);
+		this.path = path;
 	}
 
 	public String getName() {
@@ -25,10 +25,10 @@ public class PatchGroup extends PatchElement {
 		return stringBuilder.toString();
 	}
 
-	public String getHash() {
-		HashingVisitor visitor = new HashingVisitor(exceptions);
+	public String getHash(String rootDir) {
+		HashingVisitor visitor = new HashingVisitor(this, rootDir);
 		try {
-			Files.walkFileTree(path, visitor);
+			Files.walkFileTree(Paths.get(rootDir, path), visitor);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -36,7 +36,7 @@ public class PatchGroup extends PatchElement {
 	}
 
 	public PatchGroup except(String exception) {
-		exceptions.add(Paths.get(exception));
+		exceptions.add(exception);
 		return this;
 	}
 
@@ -57,10 +57,10 @@ public class PatchGroup extends PatchElement {
 		if (group.exceptions.size() != this.exceptions.size()) {
 			return false;
 		}
-		for (Path exception : exceptions) {
+		for (String exception : exceptions) {
 			boolean match = false;
-			for (Path exception2 : group.exceptions) {
-				if (exception.equals(exception2)) {
+			for (String exception2 : group.exceptions) {
+				if (exception.equalsIgnoreCase(exception2)) {
 					match = true;
 					break;
 				}
@@ -70,5 +70,14 @@ public class PatchGroup extends PatchElement {
 			}
 		}
 		return true;
+	}
+	
+	public boolean shouldIgnore(String path) {
+		return exceptions.contains(path);
+	}
+
+	public void zip(ZipOutputStream zipStream, String rootDir) throws IOException {
+		ZippingVisitor visitor = new ZippingVisitor(this, zipStream, rootDir);
+		Files.walkFileTree(Paths.get(rootDir, path), visitor);
 	}
 }
