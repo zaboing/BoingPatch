@@ -1,5 +1,4 @@
 /bin/
 /libs/
 .classpath
-/test_area/
-/res/
+/build/
