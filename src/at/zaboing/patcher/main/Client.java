@@ -8,6 +8,7 @@ import at.zaboing.patcher.ZipExtractor;
 import at.zaboing.patcher.manifest.ManifestReader;
 import at.zaboing.patcher.manifest.PatchManifest;
 
+
 public class Client {
 	public static void main(String... args) {
 		if (args.length < 2) {

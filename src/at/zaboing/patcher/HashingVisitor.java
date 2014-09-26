@@ -32,12 +32,10 @@ public class HashingVisitor implements FileVisitor<Path> {
 	@Override
 	public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
-		String path = rootDir.relativize(arg0).toString();
-		System.out.println(path);
+		String path = rootDir.relativize(arg0).normalize().toString();
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.SKIP_SUBTREE;
 		}
-
 		hasher.putBytes(path.getBytes("UTF-8"));
 
 		return FileVisitResult.CONTINUE;
@@ -46,7 +44,7 @@ public class HashingVisitor implements FileVisitor<Path> {
 	@Override
 	public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
-		String path = rootDir.relativize(arg0).toString();
+		String path = rootDir.relativize(arg0).normalize().toString();
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.CONTINUE;
 		}

@@ -29,7 +29,7 @@ public class ZippingVisitor implements FileVisitor<Path> {
 
 	public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
-		String path = rootDir.relativize(arg0).toString();
+		String path = rootDir.relativize(arg0).normalize().toString();
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.SKIP_SUBTREE;
 		}
@@ -47,7 +47,7 @@ public class ZippingVisitor implements FileVisitor<Path> {
 
 	public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1)
 			throws IOException {
-		String path = rootDir.relativize(arg0).toString();
+		String path = rootDir.relativize(arg0).normalize().toString();
 		if (group.shouldIgnore(path)) {
 			return FileVisitResult.CONTINUE;
 		}
