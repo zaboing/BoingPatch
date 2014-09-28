@@ -22,36 +22,45 @@ import java.util.Set;
 
 import at.zaboing.patcher.manifest.PatchManifest;
 
-public class HashRegistry {
+public class HashRegistry
+{
 	private final Map<String, String> hashes;
 
-	private HashRegistry() {
+	private HashRegistry()
+	{
 		this.hashes = new HashMap<String, String>();
 	}
 
-	private HashRegistry(Map<String, String> hashes) {
+	private HashRegistry(Map<String, String> hashes)
+	{
 		this.hashes = hashes;
 	}
 
-	public void clear() {
+	public void clear()
+	{
 		hashes.clear();
 	}
 
-	public String getHash(String name) {
+	public String getHash(String name)
+	{
 		return hashes.get(name);
 	}
 
-	public void register(String name, String hash) {
+	public void register(String name, String hash)
+	{
 		hashes.put(name, hash);
 	}
 
-	public Set<String> getDifferences(HashRegistry registry) {
+	public Set<String> getDifferences(HashRegistry registry)
+	{
 		Set<String> differences = new HashSet<String>();
 
-		for (String name : hashes.keySet()) {
+		for (String name : hashes.keySet())
+		{
 			String hash = String.valueOf(getHash(name));
 			String hash2 = String.valueOf(registry.getHash(name));
-			if (!hash.equals(hash2)) {
+			if (!hash.equals(hash2))
+			{
 				differences.add(name);
 			}
 		}
@@ -59,78 +68,94 @@ public class HashRegistry {
 		return differences;
 	}
 
-	public static HashRegistry createFromManifest(PatchManifest manifest, String rootDir) {
+	public static HashRegistry createFromManifest(PatchManifest manifest, String rootDir)
+	{
 		HashRegistry registry = new HashRegistry();
 
-		manifest.elements.forEach(element -> registry.register(
-				element.getName(), element.getHash(rootDir)));
+		manifest.elements.forEach(element -> registry.register(element.getName(), element.getHash(rootDir)));
 
 		return registry;
 	}
 
-	public static HashRegistry createFromStream(InputStream inputStream) {
+	public static HashRegistry createFromStream(InputStream inputStream)
+	{
 		Reader reader = new InputStreamReader(inputStream);
 		return createFromReader(reader);
 	}
 
-	public static HashRegistry createFromReader(Reader reader) {
+	public static HashRegistry createFromReader(Reader reader)
+	{
 		BufferedReader br = new BufferedReader(reader);
 		String line;
-		try {
+		try
+		{
 			Map<String, String> registry = new HashMap<String, String>();
-			while (Objects.nonNull(line = br.readLine())) {
-				if (line.contains(" - ")) {
+			while (Objects.nonNull(line = br.readLine()))
+			{
+				if (line.contains(" - "))
+				{
 					String name = line.substring(0, line.indexOf(" - "));
 					String hash = line.substring(line.indexOf(" - ") + 3);
 					registry.put(name, hash);
 				}
 			}
 			return new HashRegistry(registry);
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static HashRegistry createFromFile(File file) {
-		try (Reader reader = new BufferedReader(new FileReader(file))) {
+	public static HashRegistry createFromFile(File file)
+	{
+		try (Reader reader = new BufferedReader(new FileReader(file)))
+		{
 			return createFromReader(reader);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e)
+		{
 			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 		return null;
 	}
 
-	public static HashRegistry createFromFile(String filePath) {
+	public static HashRegistry createFromFile(String filePath)
+	{
 		return createFromPath(Paths.get(filePath));
 	}
 
-	public static HashRegistry createFromPath(Path filePath) {
-		try (Reader reader = Files.newBufferedReader(filePath)) {
+	public static HashRegistry createFromPath(Path filePath)
+	{
+		try (Reader reader = Files.newBufferedReader(filePath))
+		{
 			return createFromReader(reader);
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 			return null;
 		}
 	}
 
-	public static HashRegistry createFromString(String registry) {
-		try (StringReader reader = new StringReader(registry)) {
+	public static HashRegistry createFromString(String registry)
+	{
+		try (StringReader reader = new StringReader(registry))
+		{
 			return createFromReader(reader);
 		}
 	}
 
-	public static HashRegistry createFromURL(URL url) {
-		try {
+	public static HashRegistry createFromURL(URL url)
+	{
+		try
+		{
 			URLConnection connection = url.openConnection();
-			connection
-					.setRequestProperty(
-							"User-Agent",
-							"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
 			return createFromStream(connection.getInputStream());
-		} catch (IOException e) {
+		} catch (IOException e)
+		{
 			e.printStackTrace();
 		}
 

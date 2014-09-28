@@ -10,30 +10,33 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import com.google.common.hash.Hasher;
 
-public class HashingVisitor implements FileVisitor<Path> {
+public class HashingVisitor implements FileVisitor<Path>
+{
 
 	private final Path rootDir;
-	
+
 	private final Hasher hasher = HashUtils.hasher();
 
 	private final PatchGroup group;
 
-	public HashingVisitor(PatchGroup group, String rootDir) {
+	public HashingVisitor(PatchGroup group, String rootDir)
+	{
 		this.group = group;
 		this.rootDir = Paths.get(rootDir);
 	}
 
 	@Override
-	public FileVisitResult postVisitDirectory(Path arg0, IOException arg1)
-			throws IOException {
+	public FileVisitResult postVisitDirectory(Path arg0, IOException arg1) throws IOException
+	{
 		return FileVisitResult.CONTINUE;
 	}
 
 	@Override
-	public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1)
-			throws IOException {
+	public FileVisitResult preVisitDirectory(Path arg0, BasicFileAttributes arg1) throws IOException
+	{
 		String path = rootDir.relativize(arg0).normalize().toString();
-		if (group.shouldIgnore(path)) {
+		if (group.shouldIgnore(path))
+		{
 			return FileVisitResult.SKIP_SUBTREE;
 		}
 		hasher.putBytes(path.getBytes("UTF-8"));
@@ -42,10 +45,11 @@ public class HashingVisitor implements FileVisitor<Path> {
 	}
 
 	@Override
-	public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1)
-			throws IOException {
+	public FileVisitResult visitFile(Path arg0, BasicFileAttributes arg1) throws IOException
+	{
 		String path = rootDir.relativize(arg0).normalize().toString();
-		if (group.shouldIgnore(path)) {
+		if (group.shouldIgnore(path))
+		{
 			return FileVisitResult.CONTINUE;
 		}
 
@@ -56,12 +60,13 @@ public class HashingVisitor implements FileVisitor<Path> {
 	}
 
 	@Override
-	public FileVisitResult visitFileFailed(Path arg0, IOException arg1)
-			throws IOException {
+	public FileVisitResult visitFileFailed(Path arg0, IOException arg1) throws IOException
+	{
 		return FileVisitResult.CONTINUE;
 	}
 
-	public byte[] getHash() {
+	public byte[] getHash()
+	{
 		return hasher.hash().asBytes();
 	}
 }
