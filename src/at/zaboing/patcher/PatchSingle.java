@@ -2,7 +2,10 @@ package at.zaboing.patcher;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -52,6 +55,9 @@ public class PatchSingle extends PatchElement
 			byte[] content = Files.readAllBytes(Paths.get(rootDir, path));
 
 			hash = HashUtils.hash(content);
+		} catch (NoSuchFileException e)
+		{
+			return "ERROR";
 		} catch (IOException e)
 		{
 			e.printStackTrace();
@@ -67,5 +73,12 @@ public class PatchSingle extends PatchElement
 		zipStream.putNextEntry(entry);
 		zipStream.write(Files.readAllBytes(Paths.get(rootDir, path)));
 		zipStream.closeEntry();
+	}
+
+	public Set<String> getFiles(String dir)
+	{
+		Set<String> files = new HashSet<>();
+		files.add(Paths.get(dir, path).normalize().toString());
+		return files;
 	}
 }

@@ -21,7 +21,7 @@ public class ZippingVisitor implements FileVisitor<Path>
 	{
 		this.group = group;
 		this.zipStream = zipStream;
-		this.rootDir = Paths.get(rootDir);
+		this.rootDir = Paths.get(rootDir).normalize();
 	}
 
 	public FileVisitResult postVisitDirectory(Path arg0, IOException arg1) throws IOException

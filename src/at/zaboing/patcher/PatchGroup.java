@@ -2,9 +2,12 @@ package at.zaboing.patcher;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 public class PatchGroup extends PatchElement
@@ -15,7 +18,12 @@ public class PatchGroup extends PatchElement
 
 	public PatchGroup(String path)
 	{
-		this.path = path;
+		Path normalized = Paths.get(path).normalize();
+		this.path = normalized.toString();
+		if (this.path.isEmpty())
+		{
+			this.path = ".";
+		}
 	}
 
 	public String getName()
@@ -43,7 +51,8 @@ public class PatchGroup extends PatchElement
 
 	public PatchGroup except(String exception)
 	{
-		exceptions.add(exception);
+		Path normalized = Paths.get(exception).normalize();
+		exceptions.add(normalized.toString());
 		return this;
 	}
 
@@ -98,5 +107,19 @@ public class PatchGroup extends PatchElement
 	{
 		ZippingVisitor visitor = new ZippingVisitor(this, zipStream, rootDir);
 		Files.walkFileTree(Paths.get(rootDir, path), visitor);
+	}
+
+	public Set<String> getFiles(String dir)
+	{
+		Set<String> files = new HashSet<>();
+		MappingVisitor visitor = new MappingVisitor(this, files, dir);
+		try
+		{
+			Files.walkFileTree(Paths.get(dir, path), visitor);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return files;
 	}
 }

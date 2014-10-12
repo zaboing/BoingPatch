@@ -6,13 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import at.zaboing.patcher.manifest.PatchManifest;
 
 public class ZipExtractor implements Runnable
 {
@@ -23,6 +28,14 @@ public class ZipExtractor implements Runnable
 
 	public boolean threaded;
 	public int threads;
+
+	public int progress;
+
+	public PatchManifest manifest;
+
+	public Runnable progressUpdateCallback;
+	public Runnable successCallback;
+	public Runnable errorCallback;
 
 	public ZipExtractor(Set<String> zips, String dir, String remote)
 	{
@@ -36,12 +49,12 @@ public class ZipExtractor implements Runnable
 	{
 		if (threaded)
 		{
+			long time = System.currentTimeMillis();
 			ExecutorService executor = Executors.newFixedThreadPool(threads);
 			for (String zip : zips)
 			{
-				String escaped = PatchElement.escapeString(zip);
-				InputStream stream = URLUtils.getStream(remote, escaped + ".zip");
-				ExtractTask task = new ExtractTask(stream);
+				ExtractTask task = new ExtractTask(zip);
+				task.successCallback = this::updateProgress;
 				executor.submit(task);
 			}
 			try
@@ -50,11 +63,18 @@ public class ZipExtractor implements Runnable
 				boolean success = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 				if (success)
 				{
-					System.out.println("Successfully installed patch");
+					System.out.println("Threaded: " + (System.currentTimeMillis() - time) + "ms");
+					if (successCallback != null)
+					{
+						successCallback.run();
+					}
 				}
 				else
 				{
-					System.out.println("Extracting took too long");
+					if (errorCallback != null)
+					{
+						errorCallback.run();
+					}
 				}
 			} catch (InterruptedException e)
 			{
@@ -63,33 +83,62 @@ public class ZipExtractor implements Runnable
 		}
 		else
 		{
+			long time = System.currentTimeMillis();
 			for (String zip : zips)
 			{
-				applyZip(URLUtils.getStream(remote, PatchElement.escapeString(zip) + ".zip"));
+				applyZip(zip);
+				updateProgress();
 			}
+			System.out.println("No threads: " + (System.currentTimeMillis() - time) + "ms");
+			if (successCallback != null)
+			{
+				successCallback.run();
+			}
+		}
+	}
+
+	private void updateProgress()
+	{
+		progress++;
+		if (progressUpdateCallback != null)
+		{
+			progressUpdateCallback.run();
 		}
 	}
 
 	class ExtractTask implements Runnable
 	{
-		private final InputStream inputStream;
+		private final String zip;
 
-		public ExtractTask(InputStream inputStream)
+		public Runnable successCallback;
+
+		public ExtractTask(String zip)
 		{
-			this.inputStream = inputStream;
+			this.zip = zip;
 		}
 
 		@Override
 		public void run()
 		{
-			applyZip(inputStream);
+			applyZip(zip);
+			if (successCallback != null)
+			{
+				successCallback.run();
+			}
 		}
 	}
 
-	private void applyZip(InputStream inputStream)
+	private void applyZip(String zip)
 	{
+		String escaped = PatchElement.escapeString(zip);
+		InputStream stream = URLUtils.getStream(remote, escaped + ".zip");
+		// manifest.elements.forEach(e -> System.out.println(e.getName()));
+		PatchElement element = manifest.elements.stream().filter(e -> e.getName().equals(zip)).findFirst().get();
 		File root = new File(dir);
-		try (ZipInputStream zipStream = new ZipInputStream(new BufferedInputStream(inputStream)))
+		Set<String> present = element.getFiles(dir);
+		present = present.stream().map(s -> Paths.get(s).normalize().toString()).collect(Collectors.toSet());
+		Set<String> downloaded = new HashSet<>();
+		try (ZipInputStream zipStream = new ZipInputStream(new BufferedInputStream(stream)))
 		{
 			byte[] buffer = new byte[2048];
 			ZipEntry entry;
@@ -113,6 +162,14 @@ public class ZipExtractor implements Runnable
 						}
 						outputStream.close();
 					}
+					if (!entry.toString().equals("/"))
+					{
+						downloaded.add(Paths.get(entry.toString()).normalize().toString());
+					}
+					else
+					{
+						downloaded.add("");
+					}
 				}
 			} catch (IOException e)
 			{
@@ -121,6 +178,19 @@ public class ZipExtractor implements Runnable
 		} catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+		for (String file : present)
+		{
+			if (!downloaded.contains(file))
+			{
+				try
+				{
+					Files.deleteIfExists(new File(root, file).toPath());
+				} catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 }

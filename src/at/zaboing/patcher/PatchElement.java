@@ -1,6 +1,7 @@
 package at.zaboing.patcher;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.zip.ZipOutputStream;
 
 public abstract class PatchElement
@@ -21,7 +22,11 @@ public abstract class PatchElement
 		for (int i = 0; i < len; i++)
 		{
 			char ch = s.charAt(i);
-			if (ch < ' ' || ch >= 0x7F || ch == fileSep || ch == '\\' || (ch == '.' && i == 0) || ch == escape)
+			if (ch < ' ' || ch >= 0x7F || ch == fileSep || ch == '\\' /*
+																	 * || (ch ==
+																	 * '.' && i
+																	 * == 0)
+																	 */|| ch == escape)
 			{
 				sb.append(escape);
 				if (ch < 0x10)
@@ -58,4 +63,6 @@ public abstract class PatchElement
 		}
 		return sb.toString();
 	}
+
+	public abstract Set<String> getFiles(String dir);
 }
