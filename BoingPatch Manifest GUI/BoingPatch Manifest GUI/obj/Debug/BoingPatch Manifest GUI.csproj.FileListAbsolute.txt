@@ -1,0 +1,13 @@
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\bin\Debug\BoingPatch Manifest GUI.exe.config
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI.csprojResolveAssemblyReference.cache
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\MainWindow.baml
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\MainWindow.g.cs
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\App.g.cs
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI_MarkupCompile.cache
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI.g.resources
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch.GUI.Properties.Resources.resources
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI.csproj.GenerateResource.Cache
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\bin\Debug\BoingPatch Manifest GUI.exe
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\bin\Debug\BoingPatch Manifest GUI.pdb
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI.exe
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\BoingPatch Manifest GUI.pdb

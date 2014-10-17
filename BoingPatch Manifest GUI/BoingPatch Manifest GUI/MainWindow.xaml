@@ -1,0 +1,29 @@
+﻿<Window x:Class="BoingPatch.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="500" Width="1024">
+    <Grid>
+        <TreeView x:Name="foldersItem"
+          Width="288" Background="#FFFFFFFF"
+          SelectedItemChanged="foldersItem_SelectedItemChanged"
+          BorderBrush="#FFFFFFFF"
+          Foreground="#FFFFFFFF" HorizontalAlignment="Left">
+            <TreeView.Resources>
+                <ContextMenu x:Key="FolderContext" StaysOpen="True">
+                    <MenuItem Header="As group" Click="createGroup" />
+                    <MenuItem Header="Show in explorer" Click="showInExplorer" />
+                    <MenuItem Header="Open Directory" Click="openFile" />
+                </ContextMenu>
+                <ContextMenu x:Key="FileContext" StaysOpen="True">
+                    <MenuItem Header="As single" Click="createSingle" />
+                    <MenuItem Header="Open File" Click="openFile" />
+                </ContextMenu>
+            </TreeView.Resources>
+        </TreeView>
+        <TreeView x:Name="groups"
+          BorderBrush="#FFFFFFFF"
+          Width="288" Background="#FFFFFFFF"
+          Foreground="#FFFFFFFF" HorizontalAlignment="Left" Margin="293,0,0,0"></TreeView>
+
+    </Grid>
+</Window>

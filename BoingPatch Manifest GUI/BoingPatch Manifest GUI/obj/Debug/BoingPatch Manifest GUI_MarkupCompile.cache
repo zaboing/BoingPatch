@@ -1,0 +1,20 @@
+﻿BoingPatch Manifest GUI
+
+
+exe
+C#
+.cs
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\obj\Debug\
+BoingPatch.GUI
+none
+false
+DEBUG;TRACE
+C:\GitHub\BoingPatch\BoingPatch Manifest GUI\BoingPatch Manifest GUI\App.xaml
+11151548125
+
+7-952128993
+13-1868018694
+MainWindow.xaml;
+
+False
+
