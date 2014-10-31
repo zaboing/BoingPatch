@@ -25,7 +25,7 @@ public class URLUtils
 		URL url;
 		try
 		{
-			url = new URL(remote + "\\" + file.replace("%", "%25").replace(" ", "%20"));
+			url = new URL(remote + "/" + file.replace("%", "%25").replace(" ", "%20"));
 		} catch (MalformedURLException e)
 		{
 			e.printStackTrace();
